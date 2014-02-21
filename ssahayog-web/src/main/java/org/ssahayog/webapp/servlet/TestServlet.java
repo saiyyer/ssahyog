@@ -48,7 +48,7 @@ public class TestServlet extends HttpServlet {
 		} else {
 			json = JsonProcessor.createStatusMessage(false, "No Query provided in the request");
 		}
-		response.setContentType("text/json");
+		response.setContentType("application/json");
 		final PrintWriter outputWriter =  response.getWriter();
 		outputWriter.write(json.toString());
 		outputWriter.flush();
