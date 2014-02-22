@@ -44,7 +44,7 @@ public class TestServlet extends HttpServlet {
 				json =  new DBQuerierDAO().getQueryResult(query);
 			} catch (ApplicationException e) {
 				json = JsonProcessor.createErrorMessage(e);
-			}			
+			}
 		} else {
 			json = JsonProcessor.createStatusMessage(false, "No Query provided in the request");
 		}
