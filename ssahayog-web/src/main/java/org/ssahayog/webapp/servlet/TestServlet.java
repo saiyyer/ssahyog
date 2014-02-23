@@ -39,14 +39,19 @@ public class TestServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		JSONObject json;
 		final String query = request.getParameter("query");
+		final String action = request.getParameter("action");
 		if(query != null){
 			try {
 				json =  new DBQuerierDAO().getQueryResult(query);
 			} catch (ApplicationException e) {
 				json = JsonProcessor.createErrorMessage(e);
 			}
-		} else {
-			json = JsonProcessor.createStatusMessage(false, "No Query provided in the request");
+		} else if  (action != null){
+			new RequestProcessor().processRequest(request, response);
+			return;
+		}
+		else {
+			json = JsonProcessor.createStatusMessage(false, "No query/action parameter provided in the request");
 		}
 		response.setContentType("application/json");
 		final PrintWriter outputWriter =  response.getWriter();

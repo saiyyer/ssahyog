@@ -44,6 +44,31 @@ INSERT INTO "PUBLIC"
 		)
 	VALUES
 		(
+			2,'Santosh I','aaa, bbb street, ccc, Maharastra','xxx yyy street, zzz, Maharastra','123 456 2345','222 444 2323','7788372821'
+			,'x@y.com','Mumbai','Maharastra',NULL,'Y',NULL,NULL,'Y','santosh',GETDATE()); 
+INSERT INTO "PUBLIC"
+	."VOLUNTEER_DETAILS"
+		(
+			"VOLUNTEERID"
+			,"VOLUNTEER_NAME"
+			,"RES_ADDRESS"
+			,"OFF_ADDRESS"
+			,"RES_PHONE"
+			,"OFF_PHONE"
+			,"MOBILE_PHONE"
+			,"EMAIL"
+			,"CITY"
+			,"STATE"
+			,"PIN"
+			,"STILL_INTERESTED"
+			,"BEST_TIME_TO_CONTACT"
+			,"TIME_COMMITMENT"
+			,"IS_ACTIVE"
+			,"MODIFIED_BY"
+			,"MODIFIED_DATE"
+		)
+	VALUES
+		(
 			1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
 				
 				

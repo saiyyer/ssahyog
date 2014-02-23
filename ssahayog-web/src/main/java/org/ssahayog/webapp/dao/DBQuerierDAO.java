@@ -1,6 +1,8 @@
 package org.ssahayog.webapp.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,6 +28,7 @@ public class DBQuerierDAO implements IDao {
 	public DBQuerierDAO(DataSource ds) throws ApplicationException {
 		this.ds = ds;
 	}
+
 	public DBQuerierDAO() throws ApplicationException {
 		Context initContext;
 		Context envContext;
@@ -39,7 +42,7 @@ public class DBQuerierDAO implements IDao {
 		}
 	}
 
-	public boolean isValidSelectQuery(final String sql)
+	private static final boolean isValidSelectQuery(final String sql)
 			throws ApplicationException {
 
 		if (sql == null || sql.contains(SEMI_COLON)
@@ -56,6 +59,54 @@ public class DBQuerierDAO implements IDao {
 		return true;
 	}
 
+	private void prepareStatement(final PreparedStatement pstmt, Object...parameters) throws SQLException{
+		if(parameters != null && parameters.length>0){
+			int position = 0;
+			for(Object param : parameters){
+				++position;
+				if(param instanceof Boolean){
+					pstmt.setBoolean(position, (Boolean) param);
+				} else if(param instanceof Integer){
+					pstmt.setInt(position, (Integer) param);					
+				} else if(param instanceof Double){
+					pstmt.setDouble(position, (Double) param);					
+				} else if(param instanceof Float){
+					pstmt.setFloat(position, (Float) param);					
+				} else if(param instanceof Date){
+					pstmt.setDate(position, (Date) param);					
+				} else if(param instanceof String){
+					// TODO: Is this relevant?
+					pstmt.setString(position, "%"+((String) param).toUpperCase()+"%");					
+				}
+			}
+		}
+	}
+
+	public JSONObject getQueryResult(String sql, Object... parameters)
+			throws ApplicationException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		if (isValidSelectQuery(sql)) {
+			try {
+				conn = ds.getConnection();
+				pstmt = conn.prepareStatement(sql);
+				prepareStatement(pstmt,parameters);
+				rs = pstmt.executeQuery();
+				return JsonProcessor.createResultSet(rs);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return JsonProcessor.createErrorMessage(new ApplicationException(
+						"Error while executing query -  " + sql, e));
+			} finally {
+				close(rs);
+				close(pstmt);
+				close(conn);
+			}
+		}
+		return JsonProcessor.createEmptyMessage();
+	}
+
 	public JSONObject getQueryResult(String sql) throws ApplicationException {
 		Connection conn = null;
 		Statement stmt = null;
@@ -67,16 +118,30 @@ public class DBQuerierDAO implements IDao {
 				rs = stmt.executeQuery(sql);
 				return JsonProcessor.createResultSet(rs);
 			} catch (SQLException e) {
-
-				throw new ApplicationException(
-						"Error while executing query -  " + sql, e);
+				e.printStackTrace();
+				JsonProcessor.createErrorMessage(new ApplicationException(
+						"Error while executing query -  " + sql, e));
 			} finally {
 				close(rs);
 				close(stmt);
 				close(conn);
 			}
 		}
-		return null;
+		return JsonProcessor.createEmptyMessage();
+	}
+
+	public JSONObject getDonorDetails(String givenName)
+			throws ApplicationException {
+		return JsonProcessor.createEmptyMessage();
+	}
+
+	public JSONObject getVolunteerDetails(String givenName)
+			throws ApplicationException {
+		final String SELECT_QUERY = "SELECT VOLUNTEERID as VolunteerID, VOLUNTEER_NAME as VolunteerName, RES_ADDRESS as ResidentialAddress FROM VOLUNTEER_DETAILS WHERE UPPER(VOLUNTEER_NAME) LIKE ?";
+		if(givenName == null){
+			return getQueryResult(SELECT_QUERY, "");
+		}
+		return getQueryResult(SELECT_QUERY, givenName);
 	}
 
 	private final void close(ResultSet rs) {
