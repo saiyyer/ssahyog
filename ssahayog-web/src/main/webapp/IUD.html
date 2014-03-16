@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet"
+		href="css/overcast/jquery-ui-1.10.4.custom.css">
+	<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+	<script src="js/jquery-ui-1.10.4.custom.js"></script>
+	<title>Insert/update/Delete Demo</title>
+	<script type="text/javascript">
+		$.fn.serializeObject = function()
+		{
+		    var o = {};
+		    var a = this.serializeArray();
+		    $.each(a, function() {
+		        if (o[this.name] !== undefined) {
+		            if (!o[this.name].push) {
+		                o[this.name] = [o[this.name]];
+		            }
+		            o[this.name].push(this.value || '');
+		        } else {
+		            o[this.name] = this.value || '';
+		        }
+		    });
+		    return o;
+		}
+		
+		function populateForm(frm, data) {   
+			$.each(data, function(key, value){  
+			    var $ctrl = $('[name='+key+']', frm); 
+			    if($ctrl.is('select')){
+			        $("option",$ctrl).each(function(){
+			            if (this.value==value) { this.selected=true; }
+			        });
+			    }
+			    else {
+			        switch($ctrl.attr("type"))  
+			        {  
+			            case "text" :   case "hidden":  case "textarea":  
+			                $ctrl.val(value);   
+			                break;   
+			            case "radio" : case "checkbox":   
+			                $ctrl.each(function(){
+			                   if($(this).attr('value') == value) {  $(this).attr("checked",value); } });   
+			                break;
+			        } 
+			    }
+			});
+		}; 
+			
+			$(document).ready(
+					function(){
+						$( "#accordion" ).accordion();
+						$( "#radioset" ).buttonset();
+						$("#searchVolunteer").click(function(event){
+							event.preventDefault();
+							var queryMap={
+									"action" : "getVolunteer",
+									"name" : $("#volunteerName").val()
+							};
+							$.ajax(
+								{
+									type: "POST",
+									url : "TestServlet",
+									data : queryMap,
+									success : function(response){
+										//var state = response.state;
+										//alert(state);
+										populateForm($("#volunteerForm"), response.result);
+									},
+									error : function(jqXHR, textStatus, errorThrown) {
+										alert("@error");
+										console.log(textStatus, errorThrown);
+									},
+									complete : function() {
+									}
+								});
+						});
+						
+						$("#submitVolunteer").click(function(event){
+							event.preventDefault();
+							var queryMap={
+								"action" : "addVolunteer",
+								"volunteer" : JSON.stringify($("#volunteerForm").serializeObject())
+							};
+							console.log("Data being pushed:-"+queryMap);
+							$
+							.ajax({
+								type : "POST",
+								url : "TestServlet",
+								//contentType : "application/json;charset=utf-8",
+								data : queryMap,
+								success : function(response) {
+									var state = response.state;
+									if(state == "success"){
+										alert("All Okie dokie");
+									} else {
+										alert("Problemo!!!"+response.result.message);
+									}
+								},
+								error : function(jqXHR, textStatus, errorThrown) {
+									alert("@error");
+									console.log(textStatus, errorThrown);
+								},
+								complete : function() {
+								}
+							});
+						});
+					});
+			
+	</script>
+	<style type="text/css">
+	body{
+		font: 62.5% "Trebuchet MS", sans-serif;
+		margin: 50px;
+	}
+	</style>
+</head>
+<body>
+	<div  id="accordion">
+		<h3> Volunteer</h3>
+		<div id="radioset">
+		<input type="radio" id="radio1" name="radio"><label for="radio1">Add</label>
+		<input type="radio" id="radio2" name="radio" checked="checked"><label for="radio2">Update</label>
+		<div id="addVolunteer" class="ui-widget" >
+			<form id="volunteerForm">
+				<table>
+					<tr>
+						<td>Volunteer Name: </td><td> <input type="text"  id="volunteerName" name="name" class="ui-widget"> </input>&nbsp; &nbsp; <button id="searchVolunteer"> Search</button></td>
+					</tr>
+					<tr>
+						<td>Residential Address:</td><td> <textarea name="residentialAddress"  id="residentialAddress" cols="50" rows="3" class="ui-widget"></textarea></td>
+					</tr>
+					<tr>
+						<td>Official Address: </td><td><textarea  name="officeAddress" id="officeAddress" cols="50" rows="3"></textarea> </td>
+					</tr>
+					<tr>
+						<td>Residential Phone:</td><td> <input type="text"  id="residentialPhone" name="residentialPhone"></td>
+				</tr>
+				<tr>
+					<td>Official Phone: </td><td><input type="text"  id="officePhone" name="officePhone"></td>
+				</tr>
+				<tr>
+					<td>Mobile Phone:</td><td><input type="text"  id="mobilePhone" name="mobilePhone"></td>
+				</tr>
+				<tr>
+					<td>Email: </td><td><input type="text" id="email"  name="email"></td>
+				</tr>
+				<tr>
+					<td>City:</td><td> <input type="text" name="city" id="city"></td>
+				</tr>
+				<tr>
+					<td>State: </td><td><input type="text" id="state" name="state"></td>
+				</tr>
+				<tr>
+					<td>Pin:</td><td> <input type="text" id="pin" name="pin"></td>
+				</tr>
+				<tr>
+					<td>Best Time to contact: </td><td><input type="text" id="bestTimeToContact" name="bestTimeToContact"></td>
+				</tr>
+				<tr>
+					<td>Time commitment:</td><td> <input type="text" id="timeCommitment" name="timeCommitment"></td>
+				</tr>
+				<tr>
+					<td colspan="2"> &nbsp;</td>
+				</tr>
+				<tr align="center">
+					<td colspan="2" align="center"> <button id="submitVolunteer"> Submit Volunteer</button> &nbsp; &nbsp;&nbsp;&nbsp; <input type="reset" value="reset">
+				</tr>
+				</table>
+			</form>				
+		</div>
+	</div>
+		<h3>Add Donor</h3>
+		<div id="addDonor">
+			<form id="donorForm">
+				<table>
+					<tr>
+						<td>Donor Name: </td><td><input type="text"  id="donorName"></td>
+					</tr>
+					<tr>
+						<td>Residential Address:</td><td> <textarea  id="residentialAddress" cols="10" rows="5"></textarea></td>
+					</tr>
+					<tr>
+						<td>Official Address:</td><td> <textarea  id="officialAddress" cols="10" rows="5"></textarea> 	</td>
+					</tr>
+					<tr>
+						<td>Residential Phone:</td><td> <input type="text"  id="residentialPhone"></td>
+					</tr>
+					<tr>
+						<td>Official Phone:</td><td> <input type="text"  id="officialPhone">	</td>
+					</tr>
+					<tr>
+						<td>Mobile Phone: </td><td><input type="text"  id="mobilePhone">	</td>
+					</tr>
+					<tr>
+						<td>Email:</td><td> <input type="text" id="email"></td>
+					</tr>
+					<tr>
+						<td>City:</td><td> <input type="text" id="city">	</td>
+					</tr>
+					<tr>
+						<td>State:</td><td> <input type="text" id="state"></td>
+					</tr>
+					<tr>
+						<td>Pin:</td><td> <input type="text" id="pin"></td>
+					</tr>
+					<tr>
+						<td>Referrer:</td><td> <input type="text" id="rederrer">	</td>
+					</tr>
+					<tr align="center">
+					<td colspan="2" align="center"> <button id="submitDonor"> Submit Donor</button> &nbsp; &nbsp;&nbsp;&nbsp; <input type="reset" value="reset">
+				</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</body>
+</html>
