@@ -6,7 +6,9 @@ import java.io.StringWriter;
 import org.json.JSONObject;
 import org.ssahayog.webapp.json.JsonProcessor;
 
-public class ApplicationException extends Throwable{
+public class ApplicationException extends RuntimeException{
+
+
 	/**
 	 * 
 	 */
