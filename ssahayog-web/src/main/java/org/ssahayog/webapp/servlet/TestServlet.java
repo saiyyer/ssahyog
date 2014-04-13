@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.ssahayog.webapp.dao.DBQuerierDAO;
 import org.ssahayog.webapp.exception.ApplicationException;
@@ -18,6 +20,8 @@ import org.ssahayog.webapp.json.JsonProcessor;
  */
 public class TestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private final Logger thisLogger = LogManager.getLogger(getClass());
 
     /**
      * Default constructor. 
@@ -30,6 +34,8 @@ public class TestServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		thisLogger.trace("doGet Method...");
 		doPost(request, response);
 	}
 
@@ -37,6 +43,8 @@ public class TestServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		thisLogger.trace("doPostMethod");
+		thisLogger.info("Hello World!!!");
 		JSONObject json;
 		final String query = request.getParameter("query");
 		final String action = request.getParameter("action");

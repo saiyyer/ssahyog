@@ -1,6 +1,31 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
   <display-name>Archetype Created Web Application</display-name>
+  
+<!-- <filter>
+    <filter-name>log4jServletFilter</filter-name>
+    <filter-class>org.apache.logging.log4j.core.web.Log4jServletFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>log4jServletFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>ERROR</dispatcher>
+    <dispatcher>ASYNC</dispatcher>
+    Servlet 3.0 w/ disabled auto-initialization only; not supported in 2.5
+</filter-mapping>
+ -->  
+  <context-param>   
+       <param-name>log4jConfiguration</param-name>
+       <param-value>log4j2.xml</param-value>
+    </context-param>
+     
+    <listener>
+        <listener-class>org.apache.logging.log4j.core.web.Log4jContextListener</listener-class>
+    </listener>
+    
   <servlet>
   	<servlet-name>TestServlet</servlet-name>
   	<display-name>TestServlet</display-name>
